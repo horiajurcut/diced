@@ -3,11 +3,6 @@ version: '3'
 services:
   web:
     build: .
-    command: python3 -m server.py
-    volumes:
-      - diced:/diced
+    command: python -m api
     ports:
       - "8080:8080"
-
-volumes:
-  diced:
