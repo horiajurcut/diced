@@ -1,8 +1,14 @@
 version: '3'
 
 services:
+  cassandra:
+    ports:
+      - "9042:9042"
+    image: cassandra:3.11
   web:
     build: .
     command: python -m api
     ports:
       - "8080:8080"
+    depends_on:
+      - cassandra
