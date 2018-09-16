@@ -11,11 +11,11 @@ from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 
-KEYSPACE = "diced"
+KEYSPACE = 'diced'
 
 
 def main():
-    cluster = Cluster(['10.7.108.10'])
+    cluster = Cluster(['cassandra'])
     session = cluster.connect()
 
     log.info('Creating keyspace...')
