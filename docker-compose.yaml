@@ -8,7 +8,10 @@ services:
     restart: always
   web:
     build: .
-    command: python3 -m api
+    command: [
+      "./wait-for-it.sh", "cassandra:9042", "--", 
+      "python3", "db_setup.py", "&&", "python3", "-m", "api"
+    ]
     ports:
       - "8080:8080"
     depends_on:
