@@ -9,8 +9,9 @@ from cassandra.query import BatchStatement
 
 class RoutesHandler:
 
-    def __init__(self, session):
+    def __init__(self, session, config):
         self.session = session
+        self.config = config
 
     async def index(self, request):
         return web.json_response({
@@ -53,6 +54,7 @@ class RoutesHandler:
         # A protocol-level batch of operations which are applied atomically
         # by default - BatchType.LOGGED
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+        # Consitency level QUORUM -> (SUM OF ALL REPLICAS / 2 + 1) rounded down
 
         # Insert data into both tables for easy lookup
         sl_query = self.session.prepare("""
@@ -69,5 +71,5 @@ class RoutesHandler:
         await self.session.execute_future(batch)
 
         return web.json_response({
-            "short_url": short_url
+            "short_url": "%s/%s" % (self.config["api"]["short_url_domain"], short_url)
         })

@@ -1,30 +1,39 @@
 import asyncio
+import pathlib
 
 from aiohttp import web
 from aiocassandra import aiosession
 from api.handlers import RoutesHandler
 from api.routes import register_routes
+from api.utils import load_config
 from cassandra.cluster import Cluster
 from cassandra.policies import DCAwareRoundRobinPolicy
 
-KEYSPACE = "diced"
+PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 
 
 async def init(loop):
+    # Load configuration file
+    config = load_config(PROJECT_ROOT / 'config' / 'config.yml')
+
     # Connect to Cassandra cluster
     cluster = Cluster(
-        ["cassandra"],
+        [config["cassandra"]["host"]],
         load_balancing_policy=DCAwareRoundRobinPolicy(),
-        port=9042)
+        port=config["cassandra"]["port"])
     session = cluster.connect()
-    session.set_keyspace(KEYSPACE)
+
+    # Set keyspace
+    session.set_keyspace(config["cassandra"]["keyspace"])
+
+    # Threaded Cassandra wrapper for asyncio
     aiosession(session)
 
+    # Setup server application
     app = web.Application(loop=loop)
-    handler = RoutesHandler(session)
-
+    handler = RoutesHandler(session, config)
     register_routes(app, handler)
-    host, port = "0.0.0.0", 8080
+    host, port = config["api"]["host"], config["api"]["port"]
 
     return app, host, port
 

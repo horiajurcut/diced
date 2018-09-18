@@ -1,3 +1,4 @@
 aiohttp==3.4.4
 aiocassandra==2.0.1
 trafaret==1.2.0
+pyyaml==3.13

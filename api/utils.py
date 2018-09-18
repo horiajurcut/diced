@@ -1,4 +1,14 @@
+import yaml
+
 BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def load_config(config_file):
+    """Load configuration file"""
+    with open(config_file, 'rt') as f:
+        data = yaml.load(f)
+
+    return data
 
 
 def encode(n, alphabet=BASE62):
