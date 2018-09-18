@@ -7,4 +7,4 @@
 python3 db_setup.py
 
 # Run API service
-python -m api
+python3 -m api

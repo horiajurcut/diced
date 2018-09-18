@@ -1,25 +1,23 @@
 import logging
 
 log = logging.getLogger()
-log.setLevel('DEBUG')
+log.setLevel("DEBUG")
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(
-    '%(asctime)s [%(levelname)s] %(name)s: %(message)s'))
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
 log.addHandler(handler)
 
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
-from cassandra.cluster import NoHostAvailable
 from cassandra.policies import DCAwareRoundRobinPolicy
 from cassandra.query import SimpleStatement
 
-
-KEYSPACE = 'diced'
+KEYSPACE = "diced"
 
 
 def main():
     cluster = Cluster(
-        ['cassandra'],
+        ["cassandra"],
         load_balancing_policy=DCAwareRoundRobinPolicy(),
         port=9042)
     session = cluster.connect()
@@ -31,13 +29,13 @@ def main():
         session.execute("DROP KEYSPACE " + KEYSPACE)
 
     # Recreate KEYSPACE
-    log.info('Creating keyspace...')
+    log.info("Creating keyspace...")
     session.execute("""
         CREATE KEYSPACE %s
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }
     """ % KEYSPACE)
 
-    log.info('Setting keyspace...')
+    log.info("Setting keyspace...")
     session.set_keyspace(KEYSPACE)
 
     # Create 'short_long' table
@@ -59,9 +57,9 @@ def main():
     """)
 
     # Close connection to cluster
-    log.info('Shutting down cluster...')
+    log.info("Shutting down cluster...")
     cluster.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
