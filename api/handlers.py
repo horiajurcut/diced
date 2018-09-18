@@ -40,6 +40,7 @@ class RoutesHandler:
     async def dice(self, request):
         data = await request.json()
         url_domain = self.config["api"]["short_url_domain"]
+        machine_id = self.config["counter"]["machines"][0]
 
         # Specify validation rule
         DiceRequest = trafaret.Dict({
@@ -68,9 +69,11 @@ class RoutesHandler:
                 "short_url": "%s/%s" % (url_domain, rows[0].short_url)
             })
 
-        counter_increment = await get_increment(self.session, self.config)
+        counter_increment = await get_increment(self.session, machine_id)
+
         if counter_increment == -1:
             raise web.HTTPInternalServerError(text="Something went wrong")
+
         short_url = base62_encode(counter_increment)
 
         # A protocol-level batch of operations which are applied atomically
