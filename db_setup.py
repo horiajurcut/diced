@@ -10,13 +10,18 @@ log.addHandler(handler)
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
 from cassandra.cluster import NoHostAvailable
+from cassandra.policies import DCAwareRoundRobinPolicy
 from cassandra.query import SimpleStatement
+
 
 KEYSPACE = 'diced'
 
 
 def main():
-    cluster = Cluster(['cassandra'])
+    cluster = Cluster(
+        ['cassandra'],
+        load_balancing_policy=DCAwareRoundRobinPolicy(),
+        port=9042)
     session = cluster.connect()
 
     # Check if KEYSPACE already exists and DROP it
