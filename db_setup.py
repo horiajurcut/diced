@@ -56,6 +56,14 @@ def main():
         )
     """)
 
+    # Create mock counter - placeholder for distributed counter
+    session.execute("""
+        CREATE TABLE distributed_counter (
+            machine_id text PRIMARY KEY,
+            increment counter
+        )
+    """)
+
     # Close connection to cluster
     log.info("Shutting down cluster...")
     cluster.shutdown()

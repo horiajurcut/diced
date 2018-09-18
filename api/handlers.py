@@ -3,8 +3,10 @@ import trafaret
 
 from aiohttp import web
 from api.utils import encode as base62_encode
+from api.counter import get_increment
 from cassandra import ConsistencyLevel
 from cassandra.query import BatchStatement
+from cassandra.query import SimpleStatement
 
 
 class RoutesHandler:
@@ -22,11 +24,12 @@ class RoutesHandler:
     async def redirect(self, request):
         short_url = request.match_info["short_url"]
 
-        query = self.session.prepare("""
+        query = """
             SELECT long_url FROM short_long WHERE short_url = '%s' LIMIT 1
-        """ % short_url)
+        """ % short_url
 
-        rows = await self.session.execute_future(query)
+        # We explicitly do not set a consistency level for high availability
+        rows = await self.session.execute_future(SimpleStatement(query))
         if not rows:
             raise web.HTTPBadRequest(text="Short URL was not found")
 
@@ -36,6 +39,7 @@ class RoutesHandler:
 
     async def dice(self, request):
         data = await request.json()
+        url_domain = self.config["api"]["short_url_domain"]
 
         # Specify validation rule
         DiceRequest = trafaret.Dict({
@@ -49,10 +53,28 @@ class RoutesHandler:
             raise web.HTTPBadRequest(text="URL is not valid")
 
         long_url = data['url']
-        short_url = base62_encode(random.randint(1, 999999))
+
+        # Check if we already have the URL in the database
+        query = """
+            SELECT short_url FROM long_short WHERE long_url = '%s' LIMIT 1
+        """ % long_url
+
+        # We explicitly do not set a consistency level for high availability
+        rows = await self.session.execute_future(SimpleStatement(query))
+
+        # If we have already shortened this URL, simply return
+        if rows:
+            return web.json_response({
+                "short_url": "%s/%s" % (url_domain, rows[0].short_url)
+            })
+
+        counter_increment = await get_increment(self.session, self.config)
+        if counter_increment == -1:
+            raise web.HTTPInternalServerError(text="Something went wrong")
+        short_url = base62_encode(counter_increment)
 
         # A protocol-level batch of operations which are applied atomically
-        # by default - BatchType.LOGGED
+        # By default the batch type is BatchType.LOGGED
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
         # Consitency level QUORUM -> (SUM OF ALL REPLICAS / 2 + 1) rounded down
 
@@ -71,5 +93,5 @@ class RoutesHandler:
         await self.session.execute_future(batch)
 
         return web.json_response({
-            "short_url": "%s/%s" % (self.config["api"]["short_url_domain"], short_url)
+            "short_url": "%s/%s" % (url_domain, short_url)
         })

@@ -6,3 +6,6 @@ api:
   short_url_domain: dice.it
   host: 0.0.0.0
   port: 8080
+counter:
+  machines:
+    - dc_1
