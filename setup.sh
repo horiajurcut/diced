@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Wait for Cassandra cluster to be up and running
-./wait-for-it.sh cassandra:9042
+bash ./wait-for-it.sh cassandra:9042
 
 # Run DB setup
 python3 db_setup.py
