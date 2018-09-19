@@ -31,4 +31,12 @@ async def test_redirect(client):
     # Check if we correctly redirect to the long URL
     response = await client.get("/" + data["short_url"].replace("https://dice.it/", ""))
 
-    assert str(response.url) is long_url
+    assert str(response.url) == long_url
+
+
+async def test_redirect_url_not_found(client):
+    # Short URL code is not in the database
+    response = await client.get("/4-0-4")
+
+    assert response.status == 400
+    assert (await response.text()) == "Short URL was not found"
