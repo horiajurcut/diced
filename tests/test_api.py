@@ -16,4 +16,18 @@ async def test_dice_url(client):
 
 
 async def test_redirect(client):
-    pass
+    long_url = "https://www.facebook.com/"
+
+    # First we need to shorten the URL
+    url_to_dice = {
+        "url": long_url
+    }
+    response = await client.post('/dice', json=url_to_dice)
+    data = await response.json()
+
+    assert "short_url" in data and len(data["short_url"])
+
+    # Check if we correctly redirect to the long URL
+    response = await client.get("/" + data["short_url"].replace("https://dice.it/", ""))
+    
+    assert str(response.url) is long_url
