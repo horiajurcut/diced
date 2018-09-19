@@ -50,7 +50,7 @@ class RoutesHandler:
         except trafaret.DataError:
             raise web.HTTPBadRequest(text="URL is not valid")
 
-        long_url = data['url']
+        long_url = data["url"]
 
         # Check if we already have the URL in the database
         query = """
