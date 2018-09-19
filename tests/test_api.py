@@ -15,6 +15,32 @@ async def test_dice_url(client):
     assert "short_url" in data and len(data["short_url"])
 
 
+async def test_dice_url_invalid(client):
+    url_to_dice = {
+        "url": "1"
+    }
+    response = await client.post('/dice', json=url_to_dice)
+
+    assert response.status == 400
+    assert (await response.text()) == "URL is not valid"
+
+
+async def test_dice_existing_url(client):
+    url_to_dice = {
+        "url": "https://google.com"
+    }
+    response = await client.post('/dice', json=url_to_dice)
+    data = await response.json()
+
+    assert "short_url" in data and len(data["short_url"])
+    existing_short_url = data["short_url"]
+
+    response = await client.post('/dice', json=url_to_dice)
+    data = await response.json()
+
+    assert data["short_url"] == existing_short_url
+
+
 async def test_redirect(client):
     # Long URL
     long_url = "https://www.facebook.com/"

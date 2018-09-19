@@ -7,7 +7,7 @@ bash ./wait-for-it.sh cassandra:9042
 python3 db_setup.py
 
 # Run tests
-pytest -p no:warnings tests/test_api.py
+pytest -p no:warnings tests
 
 # Run API service
 python3 -m api
