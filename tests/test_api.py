@@ -16,6 +16,7 @@ async def test_dice_url(client):
 
 
 async def test_redirect(client):
+    # Long URL
     long_url = "https://www.facebook.com/"
 
     # First we need to shorten the URL
