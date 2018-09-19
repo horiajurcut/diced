@@ -17,8 +17,7 @@ class RoutesHandler:
 
     async def index(self, request):
         return web.json_response({
-            "success": True,
-            "message": "DICED - The fancy URL Shortener"
+            "message": "dice.it - The Fancy URL Shortener"
         })
 
     async def redirect(self, request):
@@ -33,9 +32,7 @@ class RoutesHandler:
         if not rows:
             raise web.HTTPBadRequest(text="Short URL was not found")
 
-        return web.json_response({
-            "long_url": rows[0].long_url
-        })
+        return web.HTTPFound(location=rows[0].long_url)
 
     async def dice(self, request):
         data = await request.json()
@@ -79,7 +76,7 @@ class RoutesHandler:
         # A protocol-level batch of operations which are applied atomically
         # By default the batch type is BatchType.LOGGED
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
-        # Consitency level QUORUM -> (SUM OF ALL REPLICAS / 2 + 1) rounded down
+        # Consitency level QUORUM -> (SUM_OF_ALL_REPLICAS / 2 + 1) rounded down
 
         # Insert data into both tables for easy lookup
         sl_query = self.session.prepare("""

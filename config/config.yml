@@ -3,7 +3,7 @@ cassandra:
   host: cassandra
   port: 9042
 api:
-  short_url_domain: dice.it
+  short_url_domain: https://dice.it
   host: 0.0.0.0
   port: 8080
 counter:

@@ -1,2 +1,2 @@
-# diced
-Fancy URL Shortener
+# dice.it
+The Fancy URL Shortener
