@@ -1,6 +1,6 @@
 async def test_index_endpoint(client):
     response = await client.get('/')
-    
+
     # Assert index route is accessible
     assert response.status == 200
 
@@ -30,5 +30,5 @@ async def test_redirect(client):
 
     # Check if we correctly redirect to the long URL
     response = await client.get("/" + data["short_url"].replace("https://dice.it/", ""))
-    
+
     assert str(response.url) is long_url

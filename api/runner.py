@@ -3,6 +3,7 @@ import pathlib
 
 from aiohttp import web
 from aiocassandra import aiosession
+from api.db_store import DbStore
 from api.handlers import RoutesHandler
 from api.routes import register_routes
 from api.utils import load_config
@@ -29,9 +30,12 @@ async def init(loop):
     # Threaded Cassandra wrapper for asyncio
     aiosession(session)
 
+    # Setup database store
+    db_store = DbStore(session, config)
+
     # Setup server application
     app = web.Application(loop=loop)
-    handler = RoutesHandler(session, config)
+    handler = RoutesHandler(db_store, config)
     register_routes(app, handler)
     host, port = config["api"]["host"], config["api"]["port"]
 
