@@ -15,7 +15,9 @@ class DbStore:
         """ % short_url
 
         # We explicitly do not set a consistency level for high availability
-        rows = await self.session.execute_future(SimpleStatement(query))
+        statement = SimpleStatement(
+            query, consistency_level=ConsistencyLevel.QUORUM)
+        rows = await self.session.execute_future(statement)
 
         return rows
 
@@ -25,7 +27,9 @@ class DbStore:
         """ % long_url
 
         # We explicitly do not set a consistency level for high availability
-        rows = await self.session.execute_future(SimpleStatement(query))
+        statement = SimpleStatement(
+            query, consistency_level=ConsistencyLevel.QUORUM)
+        rows = await self.session.execute_future(statement)
 
         return rows
 
