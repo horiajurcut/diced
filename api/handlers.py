@@ -62,5 +62,6 @@ class RoutesHandler:
         await self.db_store.batch_update(short_url, long_url)
 
         return web.json_response({
+            "short_url_code": short_url,
             "short_url": "%s/%s" % (url_domain, short_url)
         })
